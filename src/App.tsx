@@ -1,10 +1,14 @@
 import { useState } from "react";
 import Alert from "./components/Alert";
 import Button from "./components/Button";
+import ListGroup from "./components/ListGroup/ListGroup";
+import { DiCodeigniter } from "react-icons/di"
+import Like from "./components/Like";
 
 
 function App() {
   const cities = ["New york", "San Francisco", "Tokyo"]
+
   const handleSelectItem = (item:string) => {
     console.log(item)
   }
@@ -16,8 +20,7 @@ function App() {
   return (
     <div>
 
-      { alertVisible && <Alert onDismiss={() => setAlertVisibility(false)}> My alert </Alert> }
-      <Button text="another" onClickButton={() => setAlertVisibility(true)} color="warning"/>
+      <Like color="red" onLike={() => console.log("Like!")} onDislike={() => console.log("Dislike!")}/>
 
     </div>
   ) 

@@ -7,7 +7,7 @@ interface Props {
 
 function Alert({children, onDismiss}: Props) {
     return (
-       <div className="alert alert-primary alert-dismissible">
+        <div className="alert alert-primary alert-dismissible">
          {children} 
          <button type="button" onClick={onDismiss} className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div> 
