@@ -22,8 +22,8 @@ function ExpandableText({children, length=100}: Props) {
     return(
         <p>
             {newText()}
-            {expanded && <button onClick={() => setExpanded(false)}> Less </button>}
-            {!expanded && children.length > length && <button onClick={() => setExpanded(true)}> More </button>}
+            {expanded && <button className="btn btn-primary" onClick={() => setExpanded(false)}> Less </button>}
+            {!expanded && children.length > length && <button className="btn btn-primary" onClick={() => setExpanded(true)}> More </button>}
         </p>
     )
 

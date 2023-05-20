@@ -8,7 +8,12 @@ import { AiOutlineConsoleSql } from "react-icons/ai";
 import Navbar from "./components/Navbar";
 import Cart from "./components/Cart";
 import ExpandableText from "./components/ExpandableText";
-
+import Form from "./components/Form";
+import TableExercise from "./expense-tracker/ExpenseList";
+import FormExercise from "./expense-tracker/FormExercise";
+import ExpenseList from "./expense-tracker/ExpenseList";
+import ExpenseFilter from "./expense-tracker/ExpenseFilter";
+import categories from "./expense-tracker/categories";
 
 function App() {
   const cities = ["New york", "San Francisco", "Tokyo"]
@@ -28,16 +33,25 @@ function App() {
 
   const [cartItems, setCartItems] = useState(["product1", "product2"]);
 
+  const [selectedCategory, setSelectedCategory] = useState("")
 
-  console.log(drink.title)
+  const [expenses, setExpenses] = useState([
+    {id: 1, description: "aaa", amount: 10, category: "Utilities"},
+    {id: 2, description: "bbb", amount: 10, category: "Utilities"},
+  ])
+
+  const visibleExpenses = selectedCategory ? expenses.filter(e => e.category === selectedCategory) : expenses;
 
   return (
     <div>
-      <ExpandableText length={100}>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-        Velit, consequuntur voluptates? Distinction a iusto assumenda molestiae cumque repellat qui dolores.
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corrupti placeat dolore non eligendi in a deserunt neque repudiandae similique aut, eius vitae culpa, doloremque ad, voluptates magni. Cupiditate, maiores similique.
-      </ExpandableText>
+      <FormExercise onSubmit={expense => setExpenses([...expenses, {...expense, id: expenses.length + 1}])} />
+
+      <div className="mb-3">
+        <ExpenseFilter onSelectCategory={(category) => setSelectedCategory(category)}/>
+      </div>
+
+      {/** That filter function will re-save all expenses except for the one with that specific id. (it will clone the list. kinda) */}
+      <ExpenseList expenses={visibleExpenses} onDelete={(id) => setExpenses(expenses.filter(e => e.id !== id)) }/>
     </div>
   ) 
 
