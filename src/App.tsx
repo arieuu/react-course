@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
-import apiClient from "./services/api-client";
 import { CanceledError } from "./services/api-client";
-
-interface User {
-  id: number,
-  name: string
-}
+import userService from "./services/user-service";
+import { User } from "./services/user-service";
 
 function App() {
 
@@ -14,13 +10,13 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
+
+    const { request, cancel } = userService.getAllUsers(); // Getting what we need from user service
 
     // We set loading to false wether we succeed in loading or not. We could just use finally but it doesn't work in strict mode
     // Signal is for in case the user stops the page before it's done requesting to an API. That way we know it and act accoordingly.
 
-    apiClient.get<User[]>("/users", {signal: controller.signal})
-      .then((res) => {
+      request.then((res) => {
         setUsers(res.data);
         // Set loading to false to hide effect
         setIsLoading(false);
@@ -34,7 +30,7 @@ function App() {
         setIsLoading(false);
       });
 
-      return(() => controller.abort())
+      return(cancel) // Effect clean up
 
   }, []);
 
@@ -44,7 +40,7 @@ function App() {
     const originalUsers = [...users];
 
     setUsers(users.filter((u) => u.id != user.id));
-    apiClient.delete("https://jsonplaceholder.typicode.com/users/" + user.id)
+    userService.deleteUser(user.id) // Calling delete from user service
 
     // If there's an error we update the state to render an error and set the array of users to its original state
 
@@ -62,7 +58,7 @@ function App() {
     setUsers([newUser, ...users]);
 
     // Request to the server
-    apiClient.post("https://jsonplaceholder.typicode.com/users/", newUser)
+    userService.addUser(newUser)
     .then((res) => {
       setUsers([res.data, ...users]);
     })
@@ -78,7 +74,7 @@ function App() {
     setUsers(users.map((u) => u.id == user.id ? updatedUser : u));
 
     // Request to server for update
-    apiClient.patch("https://jsonplaceholder.typicode.com/users/" + user.id, updateUser)
+    userService.updateUser(user, updatedUser)
       .catch((err) => {
         setError(err.message);
         setUsers(originalUsers);
