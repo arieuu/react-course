@@ -2,37 +2,11 @@ import { useEffect, useState } from "react";
 import { CanceledError } from "./services/api-client";
 import userService from "./services/user-service";
 import { User } from "./services/user-service";
+import useUsers from "./hooks/useUsers";
 
 function App() {
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [error, setError]= useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-
-    const { request, cancel } = userService.getAllUsers(); // Getting what we need from user service
-
-    // We set loading to false wether we succeed in loading or not. We could just use finally but it doesn't work in strict mode
-    // Signal is for in case the user stops the page before it's done requesting to an API. That way we know it and act accoordingly.
-
-      request.then((res) => {
-        setUsers(res.data);
-        // Set loading to false to hide effect
-        setIsLoading(false);
-      })
-
-      .catch((err) => { 
-        if(err instanceof CanceledError) return; // If it's canceled we just return without saying anything
-        setError("Something went wrong, try again later...");
-
-        // We set the loading state to false so the loading animation is hidden
-        setIsLoading(false);
-      });
-
-      return(cancel) // Effect clean up
-
-  }, []);
+  const { users, error, isLoading, setUsers, setError } = useUsers(); // Using a custom hook to fetch the list of users
 
   const userDelete = (user: User) => {
     /** Making an optimistic update where we update the UI first and then we make a call to the server to persist it */
@@ -40,7 +14,7 @@ function App() {
     const originalUsers = [...users];
 
     setUsers(users.filter((u) => u.id != user.id));
-    userService.deleteUser(user.id) // Calling delete from user service
+    userService.delete(user.id) // Calling delete from user service
 
     // If there's an error we update the state to render an error and set the array of users to its original state
 
@@ -58,7 +32,7 @@ function App() {
     setUsers([newUser, ...users]);
 
     // Request to the server
-    userService.addUser(newUser)
+    userService.add(newUser)
     .then((res) => {
       setUsers([res.data, ...users]);
     })
@@ -74,7 +48,7 @@ function App() {
     setUsers(users.map((u) => u.id == user.id ? updatedUser : u));
 
     // Request to server for update
-    userService.updateUser(user, updatedUser)
+    userService.update(user, updatedUser)
       .catch((err) => {
         setError(err.message);
         setUsers(originalUsers);
